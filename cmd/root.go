@@ -8,9 +8,9 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "MajesticCodingCLI",
-	Short: "A useful CLI for Devs",
-	Long:  `Made with Go.`,
+	Use:   "Majestic Coding CLI",
+	Short: "A useful CLI for Devs of the Majestic Coding Channel",
+	Long:  `This CLI was made with Go.`,
 }
 
 func Execute() {
