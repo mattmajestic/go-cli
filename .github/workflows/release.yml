@@ -1,0 +1,58 @@
+name: Build and Release CLI
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Triggers the workflow on version tags like v1.0.0
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.17'  # Specify the Go version you are using
+
+    - name: Build the CLI
+      run: go build -o majesticcoding-cli.exe
+
+    - name: Upload CLI as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: majesticcoding-cli
+        path: majesticcoding-cli.exe
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: majesticcoding-cli
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: majesticcoding-cli.exe
+        asset_name: majesticcoding-cli.exe
+        asset_content_type: application/octet-stream
